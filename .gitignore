@@ -1,0 +1,5 @@
+.godot/
+work/
+Builds/*
+!Builds/.gitkeep
+*.tmp
