@@ -95,11 +95,13 @@ Verified its PE32+ GUI/x86-64 header. Resources are embedded in the EXE. Loaded 
 exported pack with the matching Linux Godot engine for a startup smoke test.
 This validates packaged resource loading, not Windows execution.
 
-Delivery includes a Windows ZIP with executable/documentation/licenses and a
-complete source ZIP. The repository includes export configuration and an Actions
+Delivery includes a committed compressed Windows ZIP with executable,
+documentation and licenses. GitHub also provides the complete repository as a
+source ZIP through Code → Download ZIP. The repository includes export configuration and an Actions
 workflow to reproduce validation and publish downloadable build artifacts.
 The EXE exceeds GitHub's per-file size limit, so source is committed and the
-binary is provided as a downloadable artifact rather than a Git blob.
+compressed release ZIP (below the limit) is committed for direct download;
+the uncompressed EXE remains an ignored build output.
 
 ## Final automated results
 

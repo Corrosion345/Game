@@ -3,3 +3,5 @@ work/
 Builds/*
 !Builds/.gitkeep
 *.tmp
+!Builds/IcebeatRush-Windows-x64.zip
+!Builds/SHA256SUMS.txt

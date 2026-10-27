@@ -6,9 +6,9 @@ Nova Vale is an original ice-powered performer rescuing a frozen festival city.
 
 ## Download and play
 
-1. Download `IcebeatRush-Windows-x64.zip` from the delivery accompanying this
-   repository, or from the **Actions → Validate Godot and build Windows →
-   IcebeatRush-Windows-x64** artifact after a successful workflow run.
+1. Download [`Builds/IcebeatRush-Windows-x64.zip`](Builds/IcebeatRush-Windows-x64.zip)
+   from this repository (open the file and choose **Download raw file**), or from **Actions → Validate Godot and build Windows →
+   IcebeatRush-Windows-x64** after a successful workflow run.
 2. Extract the archive to a folder on your Windows PC.
 3. Double-click `IcebeatRush.exe`. Godot and Python are not needed to play.
    The game resources are embedded in the executable; there is no separate PCK.
@@ -16,8 +16,9 @@ Nova Vale is an original ice-powered performer rescuing a frozen festival city.
    Finish a district to unlock the next. Return to the hub to buy upgrades.
 
 The executable is generated at `Builds/IcebeatRush.exe` when exporting. Builds
-are downloadable artifacts, not committed binaries (GitHub has a 100 MB file
-limit). Source is committed on branch `work`.
+are also available as Actions artifacts. The compressed Windows release ZIP is
+committed for direct download; the raw EXE exceeds GitHub's 100 MB file limit and
+is ignored. Source is committed on branch `work`.
 
 ## Open the source project
 
