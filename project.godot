@@ -14,3 +14,8 @@ window/stretch/mode="canvas_items"
 renderer/rendering_method="gl_compatibility"
 textures/default_filters/use_nearest_mipmap_filter=false
 environment/defaults/default_clear_color=Color(0.018,0.025,0.08,1)
+
+[autoload]
+Save="*res://scripts/save.gd"
+Audio="*res://scripts/audio.gd"
+Bindings="*res://scripts/bindings.gd"

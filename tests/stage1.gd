@@ -14,7 +14,7 @@ func run() -> void:
 	var normal := SkateMotion.step(v, Vector2.DOWN, 0.1, "ice", false)
 	var drift := SkateMotion.step(v, Vector2.DOWN, 0.1, "ice", true)
 	assert(normal.angle() > drift.angle(), "Skid preserves lateral momentum")
-	var scene = load("res://scenes/main.tscn").instantiate()
+	var scene = load("res://scenes/practice.tscn").instantiate()
 	root.add_child(scene)
 	await physics_frame
 	var player: CharacterBody2D = scene.get_node("Player")
