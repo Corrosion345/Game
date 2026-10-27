@@ -1,12 +1,13 @@
 extends Node
 
-const PATH := "user://icebeat_save.json"
+var save_path := "user://icebeat_save.json"
 const UPGRADE_NAMES := ["Acceleration", "Top speed", "Drift control", "FLOW capacity", "Dash efficiency", "Ice power", "Health", "Freeze time"]
 var data: Dictionary = {"version": 1, "crystals": 0, "unlocked": 1, "upgrades": [0,0,0,0,0,0,0,0], "best": {}, "bindings": {}, "music": 0.55, "sfx": 0.7}
 
 func _ready() -> void:
-	if FileAccess.file_exists(PATH):
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+	if "--test-save" in OS.get_cmdline_user_args(): save_path = "user://icebeat_test_save.json"
+	if FileAccess.file_exists(save_path):
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 		if parsed is Dictionary and parsed.get("version") == 1:
 			for key in data:
 				if parsed.has(key) and (typeof(parsed[key]) == typeof(data[key]) or (parsed[key] is float and data[key] is int)): data[key] = parsed[key]
@@ -38,10 +39,10 @@ func record(level: int, score: int, medal: String, reward: int) -> void:
 	persist()
 
 func persist() -> void:
-	var file := FileAccess.open(PATH + ".tmp", FileAccess.WRITE)
+	var file := FileAccess.open(save_path + ".tmp", FileAccess.WRITE)
 	if file == null:
 		push_error("Cannot save progression: " + error_string(FileAccess.get_open_error()))
 		return
 	file.store_string(JSON.stringify(data))
 	file.close()
-	DirAccess.rename_absolute(PATH + ".tmp", PATH)
+	DirAccess.rename_absolute(save_path + ".tmp", save_path)

@@ -1,0 +1,1 @@
+These are actual Linux X11 / Mesa software-OpenGL captures using Godot 4.7.2. Input and boss setup were scripted. They are not Windows screenshots or evidence of a human campaign playthrough. Main menu: 1920×1080. Neon Frost: 2560×1440. Boss: 1280×720.

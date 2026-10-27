@@ -11,9 +11,13 @@ var ended := false
 var was_beacon_active := false
 var near_misses := 0
 var boss_dead := true
+var boss_pending := false
 var citizen: CharacterBody2D
 @onready var player: IceSkater = $Player
 @onready var world = $World
+
+func _enter_tree() -> void:
+	$World.level = level
 
 func _ready() -> void:
 	world.level = level
@@ -27,6 +31,15 @@ func _ready() -> void:
 	add_child(citizen)
 	var kinds := ["chaser","chaser","turret","shield","chaser","turret"]
 	var places := [Vector2(950,470),Vector2(1450,850),Vector2(2250,520),Vector2(2300,1000),Vector2(1370,1390),Vector2(850,1160)]
+	if level == 1:
+		kinds = ["chaser","elite","turret","shield","elite","turret"]
+		objectives.route = [Vector2(700,400),Vector2(1480,330),Vector2(2450,650),Vector2(2200,1260),Vector2(1400,1500),Vector2(850,1050)]
+	if level == 2:
+		kinds = ["elite","shield","turret","shield","elite","turret","chaser","elite"]
+		places.append_array([Vector2(1500,1050),Vector2(1900,750)])
+		objectives.kill_goal = 9
+		boss_dead = false
+		boss_pending = true
 	for i in range(kinds.size()): spawn_enemy(kinds[i],places[i])
 	for i in range(24):
 		var pos := Vector2(200+(i*317)%2400,260+(i*211)%1300)
@@ -70,6 +83,10 @@ func nova(origin: Vector2, power: float) -> void:
 func _physics_process(dt: float) -> void:
 	if ended: return
 	elapsed += dt
+	if boss_pending and objectives.kills>=8:
+		boss_pending = false
+		spawn_enemy("boss",Vector2(1530,870))
+		Audio.sfx("nova")
 	player.surface = world.surface_at(player.position)
 	var previous_gate := objectives.gate
 	objectives.rescued = citizen.rescued

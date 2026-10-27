@@ -17,6 +17,14 @@ func _ready() -> void:
 	flow_bar.position = Vector2(45,165)
 	flow_bar.size = Vector2(370,14)
 	flow_bar.show_percentage = false
+	var background := StyleBoxFlat.new()
+	background.bg_color = Color("192f4b")
+	background.set_corner_radius_all(7)
+	flow_bar.add_theme_stylebox_override("background",background)
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = Color("70eaff")
+	fill.set_corner_radius_all(7)
+	flow_bar.add_theme_stylebox_override("fill",fill)
 	add_child(flow_bar)
 	objectives_label = make_label(Vector2(45,210),22)
 	tip = make_label(Vector2(45,1000),22)
@@ -43,10 +51,15 @@ func _process(_dt: float) -> void:
 	flow_bar.value = p.flow
 	objectives_label.text = obj.lines().replace("\n","
 ")
+	if mission.level == 2 and not mission.boss_dead:
+			objectives_label.text += "\nSTORM CORE  /  " + ("clear minions to reveal boss" if mission.boss_pending else "dodge the pink telegraphs")
+			for enemy in get_tree().get_nodes_in_group("enemies"):
+				if enemy.kind == "boss": objectives_label.text += "\nBOSS PHASE %d   %d / %d HP" % [enemy.phase,int(enemy.health),int(enemy.max_health)]
 	if obj.beacon_active:
 		objectives_label.text += "
 EXTRACT NOW   %.1f seconds" % obj.extraction_left
 	tip.text = "WASD / LS  skate     SHIFT / LT  drift     SPACE / A  dash [18 FLOW]     LMB / RT  fire     E / X  nova [40 FLOW]     ESC  pause"
+	tip.text = tip.text.replace("[18 FLOW]","[%d FLOW]" % (18-Save.tier(4)*3))
 	if mission.elapsed<12: tip.text = "Keep your momentum. Follow numbered gates at speed. Shoot the frozen citizen, then lead them to the green rescue zone."
 	queue_redraw()
 
@@ -58,9 +71,9 @@ func _draw() -> void:
 	var scale_map := Vector2(0.1,0.1)
 	draw_style_box(panel_style(),Rect2(origin-Vector2(12,12),Vector2(304,204)))
 	for rect in mission.world.walls: draw_rect(Rect2(origin+rect.position*scale_map,rect.size*scale_map),Color("36506a"))
-	for i in range(mission.objectives.GATES.size()):
+	for i in range(mission.objectives.route.size()):
 		var c := Color("71f6ff") if i==mission.objectives.gate else Color("3b6378")
-		draw_circle(origin+mission.objectives.GATES[i]*scale_map,5,c)
+		draw_circle(origin+mission.objectives.route[i]*scale_map,5,c)
 	draw_circle(origin+mission.objectives.BEACON*scale_map,6,Color("ff7ad0"))
 	draw_circle(origin+mission.objectives.EXTRACTION*scale_map,6,Color("ffdc8e"))
 	draw_circle(origin+mission.citizen.position*scale_map,4,Color("9cffc7"))

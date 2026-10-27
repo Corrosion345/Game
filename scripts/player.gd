@@ -8,6 +8,7 @@ var surface := "ice"
 var facing := Vector2.RIGHT
 var aim := Vector2.RIGHT
 var trail: Line2D
+var particles: GPUParticles2D
 var controlled := true
 var flow := 30.0
 var flow_max := 100.0
@@ -33,6 +34,34 @@ func _ready() -> void:
 	trail.width = 4.0
 	trail.default_color = Color(0.4, 0.95, 1, 0.5)
 	add_child(trail)
+	particles = GPUParticles2D.new()
+	particles.amount = 44
+	particles.lifetime = 0.45
+	particles.local_coords = false
+	particles.visibility_rect = Rect2(-1200,-1200,2400,2400)
+	var texture := GradientTexture2D.new()
+	texture.width = 12
+	texture.height = 12
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5,0.5)
+	texture.fill_to = Vector2(0.5,0)
+	var gradient := Gradient.new()
+	gradient.colors = PackedColorArray([Color.WHITE,Color(1,1,1,0)])
+	texture.gradient = gradient
+	particles.texture = texture
+	var material := ParticleProcessMaterial.new()
+	material.gravity = Vector3.ZERO
+	material.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	material.emission_sphere_radius = 10
+	material.initial_velocity_min = 20
+	material.initial_velocity_max = 90
+	material.scale_min = 0.25
+	material.scale_max = 0.75
+	material.color = Color("93f9ff")
+	particles.process_material = material
+	particles.emitting = false
+	particles.position = Vector2(0,25)
+	add_child(particles)
 
 func _physics_process(dt: float) -> void:
 	if not controlled: return
@@ -69,6 +98,9 @@ func _physics_process(dt: float) -> void:
 		trail.add_point(global_position + Vector2(0, 23))
 		if trail.get_point_count() > 35: trail.remove_point(0)
 	elif trail.get_point_count() > 0: trail.remove_point(0)
+	particles.emitting = velocity.length()>180
+	particles.amount_ratio = clampf(velocity.length()/700,0.1,1)
+	particles.process_material.direction = Vector3(-facing.x,-facing.y,0)
 	trail.width = 3 + flow / flow_max * 7 + (8 if dash_time > 0 else 0)
 	art.rotation = lerp_angle(art.rotation, velocity.x / 640.0 * (0.3 if drift else 0.18), dt * 8)
 	art.flip_h = facing.x < -0.1

@@ -9,6 +9,7 @@ static func step(v: Vector2, axis: Vector2, dt: float, surface: String, drift: b
 		var direction := axis.normalized()
 		var speed := v.length()
 		var grip := (1.5 + grip_bonus) if drift else (3.7 + grip_bonus)
+		grip *= lerpf(1.25,0.7,clampf(speed / top_speed,0,1))
 		if speed > 25.0:
 			var angle := v.angle_to(direction)
 			v = v.rotated(clampf(angle, -grip * dt, grip * dt))

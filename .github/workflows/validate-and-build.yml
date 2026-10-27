@@ -1,0 +1,42 @@
+name: Validate Godot and build Windows
+on:
+  push:
+    branches: [work, main, master]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install matching standard Godot editor and Windows templates
+        run: |
+          mkdir -p work/tools
+          wget -q https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -O work/tools/editor.zip
+          unzip -q work/tools/editor.zip -d work/tools
+          chmod +x work/tools/Godot_v4.7.2-stable_linux.x86_64
+          wget -q https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz -O work/tools/templates.tpz
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          unzip -j -q work/tools/templates.tpz 'templates/windows_release_x86_64.exe' 'templates/windows_debug_x86_64.exe' -d "$HOME/.local/share/godot/export_templates/4.7.2.stable"
+      - name: Validate resources and gameplay logic
+        run: GODOT_BIN="$PWD/work/tools/Godot_v4.7.2-stable_linux.x86_64" python3 tools/validate.py
+      - name: Export native Windows executable
+        run: |
+          mkdir -p Builds
+          work/tools/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release 'Windows Desktop' Builds/IcebeatRush.exe
+          test -s Builds/IcebeatRush.exe
+          cp README.md Builds/README.md
+          cp LICENSE Builds/LICENSE
+          cp GODOT_LICENSE.txt Builds/GODOT_LICENSE.txt
+          cp GODOT_THIRD_PARTY.txt Builds/GODOT_THIRD_PARTY.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IcebeatRush-Windows-x64
+          path: Builds/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-logs
+          path: work/validation/*.log

@@ -2,6 +2,7 @@ class_name MissionObjectives
 extends RefCounted
 
 const GATES := [Vector2(750,400), Vector2(1450,330), Vector2(2310,650), Vector2(2200,1150), Vector2(1500,1460), Vector2(850,1050)]
+var route: Array[Vector2] = [Vector2(750,400), Vector2(1450,330), Vector2(2310,650), Vector2(2200,1150), Vector2(1500,1460), Vector2(850,1050)]
 var gate := 0
 var kills := 0
 var rescued := false
@@ -16,10 +17,10 @@ const EXTRACTION := Vector2(430,1450)
 const RESCUE := Vector2(420,700)
 
 func primaries_complete() -> bool:
-	return gate >= GATES.size() and kills >= kill_goal and rescued
+	return gate >= route.size() and kills >= kill_goal and rescued
 
 func tick(pos: Vector2, speed: float, dt: float) -> void:
-	if gate < GATES.size() and pos.distance_to(GATES[gate]) < 85 and speed > 180: gate += 1
+	if gate < route.size() and pos.distance_to(route[gate]) < 85 and speed > 180: gate += 1
 	if primaries_complete() and not beacon_active and pos.distance_to(BEACON) < 190 and speed > 140:
 		charge += dt
 		if charge >= 4.0: beacon_active = true

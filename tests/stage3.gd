@@ -52,4 +52,6 @@ func run() -> void:
 	save_manager.persist()
 	await create_timer(1).timeout
 	print("STAGE 3 mission lifecycle failures: ", failures)
+	root.get_node("Audio").shutdown()
+	await create_timer(0.2).timeout
 	quit(failures)

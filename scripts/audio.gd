@@ -4,9 +4,11 @@ var music: AudioStreamPlayer
 var skate: AudioStreamPlayer
 var effects: Array[AudioStreamPlayer] = []
 var cursor := 0
+var enabled := true
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	enabled = DisplayServer.get_name() != "headless"
 	for name in ["Music", "Effects"]:
 		AudioServer.add_bus()
 		AudioServer.set_bus_name(AudioServer.bus_count - 1, name)
@@ -15,7 +17,7 @@ func _ready() -> void:
 	music.bus = "Music"
 	add_child(music)
 	music.finished.connect(func(): music.play())
-	music.play()
+	if enabled: music.play()
 	for i in range(12):
 		var effect := AudioStreamPlayer.new()
 		effect.bus = "Effects"
@@ -27,7 +29,7 @@ func _ready() -> void:
 	add_child(skate)
 	skate.finished.connect(func(): skate.play())
 	skate.volume_db = -80
-	skate.play()
+	if enabled: skate.play()
 	volume("Music", float(Save.data["music"]))
 	volume("Effects", float(Save.data["sfx"]))
 
@@ -36,6 +38,7 @@ func volume(bus: String, value: float) -> void:
 	AudioServer.set_bus_mute(AudioServer.get_bus_index(bus), value <= 0)
 
 func sfx(name: String, pitch := 1.0) -> void:
+	if not enabled: return
 	var effect := effects[cursor % effects.size()]
 	cursor += 1
 	effect.stream = load("res://assets/audio/" + name + ".wav")
@@ -44,8 +47,12 @@ func sfx(name: String, pitch := 1.0) -> void:
 
 func shutdown() -> void:
 	music.stop()
+	music.stream = null
 	skate.stop()
-	for effect in effects: effect.stop()
+	skate.stream = null
+	for effect in effects:
+		effect.stop()
+		effect.stream = null
 
 func _exit_tree() -> void:
 	shutdown()

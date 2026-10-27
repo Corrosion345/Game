@@ -19,6 +19,7 @@ func take_hit(amount: float, _direction := Vector2.ZERO, _charged := false) -> v
 	health -= amount
 	if health <= 0:
 		freed = true
+		collision_layer = 0
 		Audio.sfx("collect")
 		load("res://scripts/effect.gd").burst(get_parent(), position, 100.0)
 

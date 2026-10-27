@@ -28,4 +28,6 @@ func run() -> void:
 	print("Wall final position: ", player.position)
 	assert(player.position.x < 2740 and player.position.y > 705, "Wall collision and sliding")
 	print("STAGE 1 PASS: acceleration, cap, coasting, surfaces, drift, scene/input, collision/sliding")
+	root.get_node("Audio").shutdown()
+	await create_timer(0.2).timeout
 	quit()

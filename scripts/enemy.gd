@@ -31,17 +31,23 @@ func _physics_process(dt: float) -> void:
 	art.self_modulate = Color(3,3,3) if hit_flash > 0 else (Color("65deff") if frozen > 0 else Color.WHITE)
 	if frozen > 0: return
 	var delta := target.global_position - global_position
-	facing = delta.normalized()
+	if kind == "shield": facing = facing.rotated(clampf(facing.angle_to(delta.normalized()),-dt*1.7,dt*1.7))
+	else: facing = delta.normalized()
 	cooldown -= dt
 	if kind == "boss":
 		phase = 1 + int(health < max_health * 0.66) + int(health < max_health * 0.33)
 		boss_cycle += dt
 		velocity = facing * (65 + phase * 20) if delta.length() > 300 else Vector2.ZERO
+		if phase == 3 and cooldown < 0.85: velocity = facing * 360
 		if cooldown < 0.85:
 			telegraph = 0.85 - cooldown
 		if cooldown <= 0:
 			for i in range(8 + phase * 4):
 				shoot(Vector2.from_angle(i * TAU / (8 + phase * 4) + boss_cycle * 0.3), 220 + phase * 45)
+			if phase >= 2:
+				shoot(facing,420)
+				shoot(facing.rotated(0.15),390)
+				shoot(facing.rotated(-0.15),390)
 			cooldown = 3.6 - phase * 0.5
 			telegraph = 0
 	else:

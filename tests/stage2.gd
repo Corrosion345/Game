@@ -36,4 +36,6 @@ func run() -> void:
 	enemy.queue_free()
 	await process_frame
 	print("STAGE 2: FLOW, costs, cooldowns, damage, invulnerability, directional shields, freeze. Failures: ",failures)
+	root.get_node("Audio").shutdown()
+	await create_timer(0.2).timeout
 	quit(failures)

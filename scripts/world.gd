@@ -7,6 +7,10 @@ var walls: Array[Rect2] = [Rect2(0,0,2800,45),Rect2(0,1755,2800,45),Rect2(0,0,45
 var obstacles: Array[StaticBody2D] = []
 
 func _ready() -> void:
+	if level == 1:
+		walls.append_array([Rect2(1000,480,700,110),Rect2(1250,1110,400,100),Rect2(2050,750,100,280)])
+	if level == 2:
+		walls = [Rect2(0,0,2800,45),Rect2(0,1755,2800,45),Rect2(0,0,45,1800),Rect2(2755,0,45,1800),Rect2(900,620,140,160),Rect2(1860,620,140,160),Rect2(900,1120,140,160),Rect2(1860,1120,140,160)]
 	var floor := ColorRect.new()
 	floor.size = Vector2(2800,1800)
 	floor.z_index = -5
@@ -31,6 +35,21 @@ func _ready() -> void:
 			sprite.position = rect.get_center() - Vector2(0,55)
 			sprite.z_index = 1
 			add_child(sprite)
+	if level == 1:
+		for i in range(2):
+			var barrier := AnimatableBody2D.new()
+			var col := CollisionShape2D.new()
+			var shape := RectangleShape2D.new()
+			shape.size = Vector2(160,45)
+			col.shape = shape
+			barrier.position = Vector2(1420,820+i*160)
+			barrier.add_child(col)
+			var visual := Polygon2D.new()
+			visual.polygon = PackedVector2Array([Vector2(-80,-22),Vector2(80,-22),Vector2(90,0),Vector2(80,22),Vector2(-80,22),Vector2(-90,0)])
+			visual.color = Color("e6a879")
+			barrier.add_child(visual)
+			add_child(barrier)
+			obstacles.append(barrier)
 	for pos in [Vector2(900,730),Vector2(2020,1200),Vector2(1350,1200)]:
 		var body := StaticBody2D.new()
 		body.set_script(load("res://scripts/breakable.gd"))
@@ -42,6 +61,11 @@ func _ready() -> void:
 		col.shape = shape
 		body.add_child(col)
 		add_child(body)
+
+func _physics_process(_dt: float) -> void:
+	if level == 1:
+		for i in range(obstacles.size()):
+			obstacles[i].position.x = 1420 + sin(clock*0.8+i*PI)*330
 
 func surface_at(pos: Vector2) -> String:
 	if Rect2(80,1300,700,400).has_point(pos): return "snow"
@@ -80,14 +104,23 @@ func _draw() -> void:
 	for i in range(90):
 		var pos := Vector2(fmod(i*397.0+clock*18,2800),fmod(i*271.0+clock*38,1800))
 		draw_circle(pos,1.0+i%3,Color(0.8,0.95,1,0.32))
-	sign_at(Vector2(240,200),"ICEBEAT / FROZEN FESTIVAL",Color("7ca0c7"),32)
+	sign_at(Vector2(240,200),["ICEBEAT / FROZEN FESTIVAL","CRYSTAL CANAL / TRANSIT LOCKS","MIDNIGHT / STORM CORE"][level],Color("7ca0c7"),32)
+	if level == 1:
+		for y in [600,1050]:
+			draw_line(Vector2(80,y),Vector2(2700,y),Color(0.2,0.8,1,0.13),8,true)
+			draw_line(Vector2(80,y+20),Vector2(2700,y+20),Color(0.5,0.9,1,0.15),2,true)
+	if level == 2:
+		for r in [250,400,600]: draw_arc(Vector2(1470,870),r,0,TAU,96,Color(0.9,0.3,0.7,0.15),4,true)
+		for i in range(16):
+			var a := i*TAU/16+sin(clock*0.3)*0.1
+			draw_line(Vector2(1470,870)+Vector2.from_angle(a)*200,Vector2(1470,870)+Vector2.from_angle(a)*600,Color(0.9,0.3,0.7,0.08),3,true)
 	sign_at(Vector2(100,1280),"SNOWBANK • SLOWS MOMENTUM",Color("a8d5ec"),19)
 	sign_at(Vector2(2100,200),"FESTIVAL DECK",Color("d3b8e8"),23)
 	marker(MissionObjectives.RESCUE,Color("94ffcc"),"RESCUE ZONE",110)
 	if not is_instance_valid(mission): return
 	var obj = mission.objectives
-	for i in range(obj.GATES.size()):
-		var pos: Vector2 = obj.GATES[i]
+	for i in range(obj.route.size()):
+		var pos: Vector2 = obj.route[i]
 		var c := Color("57f0ff") if i == obj.gate else Color("31566c")
 		if i < obj.gate: c = Color("67bca1")
 		marker(pos,c,"%02d  /  RHYTHM GATE" % (i+1),72)
